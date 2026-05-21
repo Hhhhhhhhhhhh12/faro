@@ -8,12 +8,16 @@ export async function extractTextFromPdf(file: File): Promise<string> {
   const texts: string[] = []
 
   for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i)
-    const content = await page.getTextContent()
-    const pageText = content.items
-      .map((item) => ('str' in item ? item.str : ''))
-      .join(' ')
-    texts.push(pageText)
+    try {
+      const page = await pdf.getPage(i)
+      const content = await page.getTextContent()
+      const pageText = content.items
+        .map((item) => ('str' in item ? item.str : ''))
+        .join(' ')
+      texts.push(pageText)
+    } catch {
+      // skip corrupted page, continue with remaining pages
+    }
   }
 
   return texts.join('\n')

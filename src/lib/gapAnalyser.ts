@@ -2,11 +2,12 @@ import type { Job, SkillGapItem } from '../types'
 import { getTraining } from '../constants/trainingMap'
 
 export function computeGap(jobs: Job[], userSkills: string[]): SkillGapItem[] {
+  const userSkillSet = new Set(userSkills)
   const freq: Record<string, number> = {}
 
   for (const job of jobs) {
     for (const skill of job.requiredSkills) {
-      if (!userSkills.includes(skill)) {
+      if (!userSkillSet.has(skill)) {
         freq[skill] = (freq[skill] ?? 0) + 1
       }
     }
@@ -17,7 +18,6 @@ export function computeGap(jobs: Job[], userSkills: string[]): SkillGapItem[] {
     .map(([skill, frequency]) => ({
       skill,
       frequency,
-      missingFromProfile: true,
       training: getTraining(skill),
     }))
 }

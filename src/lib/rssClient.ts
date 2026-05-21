@@ -6,12 +6,6 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, ' ').replace(/&[a-z]+;/gi, ' ').replace(/\s+/g, ' ').trim()
 }
 
-function hashStr(str: string): string {
-  let h = 0
-  for (let i = 0; i < str.length; i++) { h = (h << 5) - h + str.charCodeAt(i); h = h & h }
-  return Math.abs(h).toString(36)
-}
-
 // --- Arbeitnow JSON API ---
 // https://www.arbeitnow.com/api/job-board-api
 // Returns: { data: [{slug, company_name, title, description, url, tags, ...}] }
@@ -35,7 +29,10 @@ export async function fetchArbeitnow(apiUrl: string, signal?: AbortSignal): Prom
   const json = await res.json() as { data?: unknown }
   if (!json || !Array.isArray(json.data)) throw new Error('Unerwartetes API-Format (Arbeitnow)')
   const jobs = (json.data as ArbeitnowJob[]).filter(
-    (j) => j && typeof j === 'object' && typeof j.title === 'string' &&
+    (j) => j && typeof j === 'object' &&
+           typeof j.title === 'string' &&
+           typeof j.company_name === 'string' &&
+           (typeof j.slug === 'string' || typeof j.url === 'string') &&
            DATA_KEYWORDS.test(j.title + ' ' + (j.tags ?? []).join(' '))
   )
   return jobs.map(j => ({
@@ -65,7 +62,13 @@ export async function fetchJobicy(apiUrl: string, signal?: AbortSignal): Promise
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   const json = await res.json() as { jobs?: unknown }
   if (!json || !Array.isArray(json.jobs)) throw new Error('Unerwartetes API-Format (Jobicy)')
-  return (json.jobs as JobicyJob[]).map(j => ({
+  const validJobs = (json.jobs as JobicyJob[]).filter(
+    (j) => j && typeof j === 'object' &&
+           typeof j.jobTitle === 'string' &&
+           typeof j.companyName === 'string' &&
+           typeof j.url === 'string'
+  )
+  return validJobs.map(j => ({
     title: `${j.jobTitle} — ${j.companyName}`,
     link: j.url,
     description: stripHtml(j.jobDescription ?? j.jobExcerpt ?? ''),
@@ -86,5 +89,3 @@ export async function fetchFeed(feed: FeedConfig, signal?: AbortSignal): Promise
   }
 }
 
-// Keep hashStr export for jobParser
-export { hashStr }

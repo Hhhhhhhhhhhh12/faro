@@ -52,7 +52,7 @@ export function useJobs(userSkills: string[]) {
       setFeedStatuses(feeds.map((f) => ({ name: f.name, status: 'loading' })))
 
       // Collect results into a local array to avoid shared-state mutation across concurrent calls
-      const results: Job[][] = new Array(feeds.length).fill([])
+      const results: Job[][] = Array.from({ length: feeds.length }, () => [])
 
       await Promise.allSettled(
         feeds.map(async (feed, i) => {

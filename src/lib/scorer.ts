@@ -1,16 +1,21 @@
 import type { Job } from '../types'
 
-export function rescoreJob(job: Job, userSkills: string[]): Job {
+function rescoreWithSet(job: Job, skillSet: Set<string>): Job {
   if (job.requiredSkills.length === 0) {
     return { ...job, matchScore: 0, matchedSkills: [] }
   }
-  const matchedSkills = job.requiredSkills.filter((s) => userSkills.includes(s))
+  const matchedSkills = job.requiredSkills.filter((s) => skillSet.has(s))
   const matchScore = Math.round((matchedSkills.length / job.requiredSkills.length) * 100)
   return { ...job, matchScore, matchedSkills }
 }
 
+export function rescoreJob(job: Job, userSkills: string[]): Job {
+  return rescoreWithSet(job, new Set(userSkills))
+}
+
 export function rescoreAll(jobs: Job[], userSkills: string[]): Job[] {
-  return jobs.map((j) => rescoreJob(j, userSkills))
+  const skillSet = new Set(userSkills)
+  return jobs.map((j) => rescoreWithSet(j, skillSet))
 }
 
 export function scoreLabel(score: number): string {

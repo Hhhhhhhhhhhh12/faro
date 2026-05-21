@@ -32,7 +32,6 @@ export interface TrainingResource {
 export interface SkillGapItem {
   skill: string
   frequency: number
-  missingFromProfile: boolean
   training: TrainingResource
 }
 

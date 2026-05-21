@@ -3,6 +3,7 @@ import type { UserProfile } from '../types'
 import { loadStorage, saveStorage } from '../lib/storage'
 import { extractTextFromPdf } from '../lib/pdfParser'
 import { extractSkills } from '../lib/skillExtractor'
+import { sanitiseSkill } from '../lib/urlSafety'
 
 export function useProfile() {
   const [profile, setProfileState] = useState<UserProfile | null>(
@@ -37,9 +38,11 @@ export function useProfile() {
   }, [saveProfile])
 
   const addSkill = useCallback((skill: string) => {
+    const normalised = sanitiseSkill(skill)
+    if (!normalised) return
     const current = profile ?? { id: 'singleton' as const, skills: [], updatedAt: Date.now() }
-    if (current.skills.includes(skill)) return
-    saveProfile({ ...current, skills: [...current.skills, skill], updatedAt: Date.now() })
+    if (current.skills.includes(normalised)) return
+    saveProfile({ ...current, skills: [...current.skills, normalised], updatedAt: Date.now() })
   }, [profile, saveProfile])
 
   const removeSkill = useCallback((skill: string) => {

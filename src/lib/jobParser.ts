@@ -39,9 +39,10 @@ function truncateDescription(desc: string): string {
 }
 
 export function parseJobFromRss(item: RawRssItem, source: JobSource, userSkills: string[]): Job {
+  const skillSet = new Set(userSkills)
   const searchText = `${item.title} ${item.description}`
   const requiredSkills = extractSkills(searchText)
-  const matchedSkills = requiredSkills.filter((s) => userSkills.includes(s))
+  const matchedSkills = requiredSkills.filter((s) => skillSet.has(s))
   const matchScore =
     requiredSkills.length > 0
       ? Math.round((matchedSkills.length / requiredSkills.length) * 100)

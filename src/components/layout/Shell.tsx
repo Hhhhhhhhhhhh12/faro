@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { ProfilePanel } from '../profile/ProfilePanel'
 import { JobFrame } from '../jobs/JobFrame'
 import { GapFrame } from '../gap/GapFrame'
-import type { Job, SkillGapItem } from '../../types'
+import { SearchBar } from './SearchBar'
+import type { Job, SkillGapItem, SearchParams } from '../../types'
 import type { FeedStatus } from '../../hooks/useJobs'
 import styles from './Shell.module.css'
 
@@ -19,8 +20,10 @@ interface Props {
   feedStatuses: FeedStatus[]
   fetching: boolean
   lastFetchedAt: number | null
-  onRefresh: () => void
+  onRefresh: (params?: SearchParams) => void
   gapItems: SkillGapItem[]
+  searchParams: SearchParams
+  onSearch: (params: SearchParams) => void
 }
 
 export function Shell(props: Props) {
@@ -30,11 +33,20 @@ export function Shell(props: Props) {
   return (
     <div className={styles.root}>
       <header className={styles.header}>
-        <div className={styles.logo}>
-          <span className={styles.logoIcon}>🌊</span>
-          <span className={styles.logoText}>Faro</span>
+        <div className={styles.headerTop}>
+          <div className={styles.logo}>
+            <span className={styles.logoIcon}>🌊</span>
+            <span className={styles.logoText}>Faro</span>
+          </div>
+          <p className={styles.tagline}>Scan jobs. Know your gaps. Level up.</p>
         </div>
-        <p className={styles.tagline}>Scan jobs. Know your gaps. Level up.</p>
+        <div className={styles.searchWrap}>
+          <SearchBar
+            initialParams={props.searchParams}
+            onSearch={props.onSearch}
+            disabled={props.fetching}
+          />
+        </div>
       </header>
 
       <div className={styles.body}>

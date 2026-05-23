@@ -1,0 +1,137 @@
+.form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.inputWrap {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  pointer-events: none;
+  user-select: none;
+}
+
+.input {
+  width: 100%;
+  padding: 0.55rem 0.75rem 0.55rem 2.25rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: #6366f1;
+}
+
+.input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Hide the native clear button */
+.input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.select {
+  padding: 0.55rem 0.6rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+  white-space: nowrap;
+}
+
+.select:focus {
+  border-color: #6366f1;
+}
+
+.select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.button {
+  padding: 0.55rem 1.1rem;
+  border: none;
+  border-radius: 8px;
+  background: #6366f1;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 5rem;
+  height: 2.3rem;
+}
+
+.button:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Compact on narrow screens */
+@media (max-width: 500px) {
+  .form {
+    flex-wrap: wrap;
+  }
+
+  .inputWrap {
+    flex: 1 1 100%;
+  }
+
+  .select {
+    flex: 1 1 0;
+  }
+
+  .button {
+    flex: 0 0 auto;
+  }
+}

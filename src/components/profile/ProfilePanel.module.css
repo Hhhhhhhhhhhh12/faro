@@ -1,6 +1,6 @@
 .panel {
-  background: #f9fafb;
-  border-right: 1px solid #e5e7eb;
+  background: var(--surface2);
+  border-right: 1px solid var(--border);
   padding: 20px 16px;
   display: flex;
   flex-direction: column;
@@ -24,7 +24,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin: 0;
   display: flex;
   align-items: center;
@@ -33,7 +33,7 @@
 
 .count {
   background: #e0e7ff;
-  color: #6366f1;
+  color: var(--accent);
   border-radius: 999px;
   padding: 1px 7px;
   font-size: 0.68rem;
@@ -44,7 +44,7 @@
 
 .error {
   font-size: 0.8rem;
-  color: #ef4444;
+  color: var(--red);
   margin: 0;
   display: flex;
   align-items: center;

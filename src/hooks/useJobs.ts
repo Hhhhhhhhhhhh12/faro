@@ -1,10 +1,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import type { Job, FeedConfig } from '../types'
+import type { Job, FeedConfig, SearchParams } from '../types'
 import { loadStorage, saveStorage, isCacheStale } from '../lib/storage'
 import { fetchFeed } from '../lib/rssClient'
 import { parseJobFromRss } from '../lib/jobParser'
 import { rescoreAll } from '../lib/scorer'
-import { FEEDS } from '../constants/feedUrls'
+import { buildFeeds } from '../constants/feedUrls'
 
 export interface FeedStatus {
   name: string
@@ -23,18 +23,17 @@ function deduplicateJobs(jobs: Job[]): Job[] {
   })
 }
 
-export function useJobs(userSkills: string[]) {
+export function useJobs(userSkills: string[], searchParams: SearchParams) {
   const stored = loadStorage()
-  const [jobs, setJobs] = useState<Job[]>(() =>
-    rescoreAll(stored.jobs, userSkills)
-  )
+  const feeds = buildFeeds(searchParams)
+
+  const [jobs, setJobs] = useState<Job[]>(() => rescoreAll(stored.jobs, userSkills))
   const [feedStatuses, setFeedStatuses] = useState<FeedStatus[]>(
-    FEEDS.map((f) => ({ name: f.name, status: 'idle' }))
+    feeds.map((f) => ({ name: f.name, status: 'idle' }))
   )
   const [fetching, setFetching] = useState(false)
   const [lastFetchedAt, setLastFetchedAt] = useState<number | null>(stored.jobsFetchedAt)
 
-  // Track the current fetch so we can cancel it on unmount or re-trigger
   const abortRef = useRef<AbortController | null>(null)
 
   const updateFeedStatus = useCallback((index: number, update: Partial<FeedStatus>) => {
@@ -42,20 +41,18 @@ export function useJobs(userSkills: string[]) {
   }, [])
 
   const fetchAllFeeds = useCallback(
-    async (feeds: FeedConfig[], skills: string[]) => {
-      // Cancel any in-flight request from a previous call
+    async (currentFeeds: FeedConfig[], skills: string[]) => {
       abortRef.current?.abort()
       const controller = new AbortController()
       abortRef.current = controller
 
       setFetching(true)
-      setFeedStatuses(feeds.map((f) => ({ name: f.name, status: 'loading' })))
+      setFeedStatuses(currentFeeds.map((f) => ({ name: f.name, status: 'loading' })))
 
-      // Collect results into a local array to avoid shared-state mutation across concurrent calls
-      const results: Job[][] = new Array(feeds.length).fill([])
+      const results: Job[][] = new Array(currentFeeds.length).fill([])
 
       await Promise.allSettled(
-        feeds.map(async (feed, i) => {
+        currentFeeds.map(async (feed, i) => {
           try {
             const items = await fetchFeed(feed, controller.signal)
             results[i] = items.map((item) => parseJobFromRss(item, feed.source, skills))
@@ -70,7 +67,6 @@ export function useJobs(userSkills: string[]) {
         })
       )
 
-      // If this fetch was aborted (component unmounted or new fetch started), discard results
       if (controller.signal.aborted) return
 
       const allJobs = results.flat()
@@ -87,17 +83,16 @@ export function useJobs(userSkills: string[]) {
     [updateFeedStatus]
   )
 
-  const refresh = useCallback(() => {
-    fetchAllFeeds(FEEDS, userSkills)
-  }, [fetchAllFeeds, userSkills])
+  const refresh = useCallback((params?: SearchParams) => {
+    const currentFeeds = buildFeeds(params ?? searchParams)
+    setFeedStatuses(currentFeeds.map((f) => ({ name: f.name, status: 'loading' })))
+    fetchAllFeeds(currentFeeds, userSkills)
+  }, [fetchAllFeeds, searchParams, userSkills])
 
   const loadOrFetch = useCallback(() => {
-    if (isCacheStale(lastFetchedAt)) {
-      refresh()
-    }
+    if (isCacheStale(lastFetchedAt)) refresh()
   }, [lastFetchedAt, refresh])
 
-  // Cancel any in-flight requests when the hook unmounts
   useEffect(() => () => { abortRef.current?.abort() }, [])
 
   return { jobs, feedStatuses, fetching, lastFetchedAt, refresh, loadOrFetch }

@@ -3,12 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#6366f1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#818cf8" media="(prefers-color-scheme: dark)" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="description" content="Faro — Scan jobs. Know your gaps. Level up. Job scanner for Data & AI professionals." />
     <!-- Content-Security-Policy: allow fetches only to known job APIs; no inline scripts -->
     <meta http-equiv="Content-Security-Policy"
       content="default-src 'self';
-               script-src 'self';
+               script-src 'self' 'unsafe-inline';
                style-src 'self' 'unsafe-inline';
                connect-src 'self' https://www.arbeitnow.com https://jobicy.com;
                img-src 'self' data:;
@@ -21,5 +26,10 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'))
+      }
+    </script>
   </body>
 </html>

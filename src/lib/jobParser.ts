@@ -51,7 +51,7 @@ export function parseJobFromRss(item: RawRssItem, source: JobSource, userSkills:
     id: hashString(item.link || item.title),
     title: extractTitle(item),
     company: extractCompany(item, source),
-    location: '',
+    location: item.location ?? '',
     url: item.link,
     publishedAt: item.pubDate,
     source,

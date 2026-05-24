@@ -40,6 +40,7 @@ export interface AppStorage {
   profile: UserProfile | null
   jobs: Job[]
   jobsFetchedAt: number | null
+  searchParams: SearchParams | null
 }
 
 export interface SkillEntry {
@@ -48,11 +49,19 @@ export interface SkillEntry {
   shortAlias: boolean // aliases with < 4 chars need word-boundary regex
 }
 
+export type LocationFilter = 'all' | 'ch' | 'de' | 'at' | 'remote'
+
+export interface SearchParams {
+  query: string
+  location: LocationFilter
+}
+
 export interface FeedConfig {
   name: string
   source: JobSource
   url: string
   type: 'rss' | 'json-arbeitnow' | 'json-jobicy'
+  locationFilter?: LocationFilter
 }
 
 export interface RawRssItem {
@@ -60,4 +69,5 @@ export interface RawRssItem {
   link: string
   description: string
   pubDate: string
+  location?: string
 }

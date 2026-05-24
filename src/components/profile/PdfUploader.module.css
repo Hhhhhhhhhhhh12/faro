@@ -11,25 +11,25 @@
   background: #fafafa;
   transition: background 0.15s, border-color 0.15s;
 }
-.zone:hover { background: #f0f4ff; border-color: #6366f1; }
+.zone:hover { background: #f0f4ff; border-color: var(--accent); }
 
 .icon { font-size: 1.8rem; }
 .label { font-size: 0.9rem; font-weight: 600; color: #374151; }
-.sub { font-size: 0.75rem; color: #9ca3af; }
+.sub { font-size: 0.75rem; color: var(--text-muted); }
 
 .loading {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 0.85rem;
-  color: #6366f1;
+  color: var(--accent);
 }
 
 .spinner {
   width: 16px;
   height: 16px;
   border: 2px solid #c7d2fe;
-  border-top-color: #6366f1;
+  border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
   display: inline-block;

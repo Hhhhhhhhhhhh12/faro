@@ -1,4 +1,4 @@
-import type { FeedConfig, RawRssItem } from '../types'
+import type { FeedConfig, LocationFilter, RawRssItem } from '../types'
 
 // --- Helpers ---
 
@@ -12,9 +12,24 @@ function hashStr(str: string): string {
   return Math.abs(h).toString(36)
 }
 
+// --- Location filtering for Arbeitnow ---
+
+const LOCATION_TERMS: Record<Exclude<LocationFilter, 'all' | 'remote'>, RegExp> = {
+  ch: /schweiz|switzerland|zürich|zurich|bern|basel|geneva|genf|lausanne|luzern|winterthur|st\.?\s*gallen/i,
+  de: /deutschland|germany|berlin|münchen|munich|hamburg|frankfurt|köln|cologne|düsseldorf|stuttgart|dortmund|bremen/i,
+  at: /österreich|austria|wien|vienna|graz|linz|salzburg|innsbruck/i,
+}
+
+function matchesLocation(jobLocation: string | undefined, filter: LocationFilter): boolean {
+  if (filter === 'all') return true
+  const loc = (jobLocation ?? '').toLowerCase()
+  if (filter === 'remote') return loc.includes('remote') || loc === ''
+  const pattern = LOCATION_TERMS[filter]
+  // Include jobs that match the region OR are remote
+  return pattern.test(jobLocation ?? '') || loc.includes('remote') || loc === ''
+}
+
 // --- Arbeitnow JSON API ---
-// https://www.arbeitnow.com/api/job-board-api
-// Returns: { data: [{slug, company_name, title, description, url, tags, ...}] }
 
 interface ArbeitnowJob {
   slug: string
@@ -25,30 +40,37 @@ interface ArbeitnowJob {
   tags: string[]
   created_at: number
   location?: string
+  remote?: boolean
 }
 
-const DATA_KEYWORDS = /data|machine learning|ml |ai |nlp|python|spark|tensorflow|pytorch|etl|analytics|scientist|engineer/i
+const DATA_KEYWORDS = /data|machine learning|\bml\b|\bai\b|nlp|python|spark|tensorflow|pytorch|etl|analytics|scientist|engineer/i
 
-export async function fetchArbeitnow(apiUrl: string, signal?: AbortSignal): Promise<RawRssItem[]> {
+export async function fetchArbeitnow(
+  apiUrl: string,
+  locationFilter: LocationFilter = 'all',
+  signal?: AbortSignal
+): Promise<RawRssItem[]> {
   const res = await fetch(apiUrl, { signal: signal ?? AbortSignal.timeout(12000) })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   const json = await res.json() as { data?: unknown }
   if (!json || !Array.isArray(json.data)) throw new Error('Unerwartetes API-Format (Arbeitnow)')
-  const jobs = (json.data as ArbeitnowJob[]).filter(
-    (j) => j && typeof j === 'object' && typeof j.title === 'string' &&
-           DATA_KEYWORDS.test(j.title + ' ' + (j.tags ?? []).join(' '))
+
+  const jobs = (json.data as ArbeitnowJob[]).filter(j =>
+    j && typeof j === 'object' && typeof j.title === 'string' &&
+    DATA_KEYWORDS.test(j.title + ' ' + (j.tags ?? []).join(' ')) &&
+    matchesLocation(j.location, locationFilter)
   )
+
   return jobs.map(j => ({
     title: `${j.title} — ${j.company_name}`,
     link: j.url || `https://www.arbeitnow.com/jobs/${j.slug}`,
     description: stripHtml(j.description ?? ''),
     pubDate: j.created_at ? new Date(j.created_at * 1000).toUTCString() : '',
+    location: j.location ?? '',
   }))
 }
 
 // --- Jobicy JSON API ---
-// https://jobicy.com/api/v2/remote-jobs
-// Returns: { jobs: [{id, url, jobTitle, companyName, jobDescription, pubDate, ...}] }
 
 interface JobicyJob {
   id: number
@@ -70,6 +92,7 @@ export async function fetchJobicy(apiUrl: string, signal?: AbortSignal): Promise
     link: j.url,
     description: stripHtml(j.jobDescription ?? j.jobExcerpt ?? ''),
     pubDate: j.pubDate ?? '',
+    location: 'Remote',
   }))
 }
 
@@ -78,7 +101,7 @@ export async function fetchJobicy(apiUrl: string, signal?: AbortSignal): Promise
 export async function fetchFeed(feed: FeedConfig, signal?: AbortSignal): Promise<RawRssItem[]> {
   switch (feed.type) {
     case 'json-arbeitnow':
-      return fetchArbeitnow(feed.url, signal)
+      return fetchArbeitnow(feed.url, feed.locationFilter ?? 'all', signal)
     case 'json-jobicy':
       return fetchJobicy(feed.url, signal)
     default:
@@ -86,5 +109,4 @@ export async function fetchFeed(feed: FeedConfig, signal?: AbortSignal): Promise
   }
 }
 
-// Keep hashStr export for jobParser
 export { hashStr }

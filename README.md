@@ -3,6 +3,8 @@
 > **Scan jobs. Know your gaps. Level up.**
 > A privacy-first, offline-capable job matching tool for Data & ML professionals — built entirely in the browser with no backend required.
 
+[![CI](https://github.com/Hhhhhhhhhhhh12/faro/actions/workflows/ci.yml/badge.svg)](https://github.com/Hhhhhhhhhhhh12/faro/actions/workflows/ci.yml)
+![Coverage](https://img.shields.io/badge/coverage-98%25-brightgreen)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6?logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-6-646cff?logo=vite&logoColor=white)

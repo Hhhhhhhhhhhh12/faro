@@ -1,6 +1,6 @@
 .item {
   background: #fff;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 16px 18px;
   display: flex;
@@ -22,14 +22,14 @@
 .skill {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   text-transform: capitalize;
 }
 
 .freq {
   font-size: 0.72rem;
-  color: #6b7280;
-  background: #f3f4f6;
+  color: var(--text-muted);
+  background: var(--bg);
   padding: 3px 10px;
   border-radius: 999px;
   font-weight: 600;
@@ -45,7 +45,7 @@
 .link {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #6366f1;
+  color: var(--accent);
   text-decoration: none;
   background: #ede9fe;
   padding: 4px 11px;
@@ -62,6 +62,6 @@
 
 .time {
   font-size: 0.73rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   padding: 3px 8px;
 }

@@ -4,13 +4,13 @@
   height: 100vh;
   overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #f3f4f6;
+  background: var(--bg);
 }
 
 /* ---- Header ---- */
 .header {
-  background: linear-gradient(to right, #ffffff, #fafbff);
-  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(to right, var(--surface), #fafbff);
+  border-bottom: 1px solid var(--border);
   box-shadow: 0 1px 4px rgba(99,102,241,0.06);
   padding: 12px 24px;
   display: flex;
@@ -35,14 +35,14 @@
 .logoText {
   font-size: 1.1rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   letter-spacing: -0.03em;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(135deg, var(--accent), #8b5cf6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-.tagline { font-size: 0.78rem; color: #9ca3af; margin: 0; white-space: nowrap; }
+.tagline { font-size: 0.78rem; color: var(--text-muted); margin: 0; white-space: nowrap; }
 
 /* ---- Body ---- */
 .body {
@@ -62,7 +62,7 @@
 /* ---- Tab Bar ---- */
 .tabBar {
   display: none;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
   background: #fff;
 }
 
@@ -74,7 +74,7 @@
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,11 +82,11 @@
   border-bottom: 2px solid transparent;
   transition: color 0.15s;
 }
-.tab:hover { color: #6366f1; }
-.tabActive { color: #6366f1; border-bottom-color: #6366f1; }
+.tab:hover { color: var(--accent); }
+.tabActive { color: var(--accent); border-bottom-color: var(--accent); }
 
 .tabBadge {
-  background: #6366f1;
+  background: var(--accent);
   color: #fff;
   border-radius: 999px;
   padding: 1px 7px;
@@ -105,7 +105,7 @@
 
 .frameWrap {
   overflow: hidden;
-  border-left: 1px solid #e5e7eb;
+  border-left: 1px solid var(--border);
 }
 
 .frameVisible { display: flex; flex-direction: column; height: 100%; }

@@ -9,7 +9,7 @@
 
 .empty {
   font-size: 0.8rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   font-style: italic;
 }
 
@@ -29,14 +29,14 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #6366f1;
+  color: var(--accent);
   font-size: 1rem;
   line-height: 1;
   padding: 0;
   display: flex;
   align-items: center;
 }
-.remove:hover { color: #ef4444; }
+.remove:hover { color: var(--red); }
 
 .inputRow {
   display: flex;
@@ -51,11 +51,11 @@
   font-size: 0.85rem;
   outline: none;
 }
-.input:focus { border-color: #6366f1; box-shadow: 0 0 0 2px #e0e7ff; }
+.input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px #e0e7ff; }
 
 .addBtn {
   padding: 6px 14px;
-  background: #6366f1;
+  background: var(--accent);
   color: white;
   border: none;
   border-radius: 8px;

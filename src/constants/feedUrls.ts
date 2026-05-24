@@ -1,39 +1,54 @@
-import type { FeedConfig } from '../types'
+import type { FeedConfig, LocationFilter, SearchParams } from '../types'
 
-export const FEEDS: FeedConfig[] = [
-  // Arbeitnow — free JSON API, CORS-friendly, Germany/remote
-  {
-    name: 'Arbeitnow — Data Science',
-    source: 'arbeitnow',
-    url: 'https://www.arbeitnow.com/api/job-board-api?search=data+scientist',
-    type: 'json-arbeitnow',
-  },
-  {
-    name: 'Arbeitnow — Machine Learning',
-    source: 'arbeitnow',
-    url: 'https://www.arbeitnow.com/api/job-board-api?search=machine+learning',
-    type: 'json-arbeitnow',
-  },
-  {
-    name: 'Arbeitnow — Data Engineer',
-    source: 'arbeitnow',
-    url: 'https://www.arbeitnow.com/api/job-board-api?search=data+engineer',
-    type: 'json-arbeitnow',
-  },
-  // Jobicy — free remote jobs API, global
-  {
-    name: 'Jobicy — Data Science (Remote)',
-    source: 'jobicy',
-    url: 'https://jobicy.com/api/v2/remote-jobs?industry=data-science&count=20',
-    type: 'json-jobicy',
-  },
-  {
-    name: 'Jobicy — Engineering & Tech (Remote)',
-    source: 'jobicy',
-    url: 'https://jobicy.com/api/v2/remote-jobs?industry=engineering&count=20',
-    type: 'json-jobicy',
-  },
-]
+export const DEFAULT_SEARCH: SearchParams = {
+  query: 'Data Scientist',
+  location: 'all',
+}
+
+const GEO_MAP: Partial<Record<LocationFilter, string>> = {
+  ch: 'switzerland',
+  de: 'germany',
+  at: 'austria',
+}
+
+export function buildFeeds(params: SearchParams): FeedConfig[] {
+  const q = encodeURIComponent(params.query || 'data scientist')
+  const feeds: FeedConfig[] = []
+
+  // --- Arbeitnow (DACH + some remote) ---
+  // Always include; location filtering applied client-side in rssClient.ts
+  if (params.location !== 'remote') {
+    feeds.push({
+      name: `Arbeitnow — ${params.query}`,
+      source: 'arbeitnow',
+      url: `https://www.arbeitnow.com/api/job-board-api?search=${q}`,
+      type: 'json-arbeitnow',
+      locationFilter: params.location,
+    })
+  }
+
+  // --- Jobicy (Remote only) ---
+  const geo = GEO_MAP[params.location]
+  if (params.location === 'remote' || params.location === 'all') {
+    // All remote jobs globally
+    feeds.push({
+      name: `Jobicy Remote — ${params.query}`,
+      source: 'jobicy',
+      url: `https://jobicy.com/api/v2/remote-jobs?count=20&industry=data-science`,
+      type: 'json-jobicy',
+    })
+  } else if (geo) {
+    // Location-specific remote jobs
+    feeds.push({
+      name: `Jobicy Remote ${params.location.toUpperCase()} — ${params.query}`,
+      source: 'jobicy',
+      url: `https://jobicy.com/api/v2/remote-jobs?count=20&industry=data-science&geo=${geo}`,
+      type: 'json-jobicy',
+    })
+  }
+
+  return feeds
+}
 
 export const SOURCE_LABELS: Record<string, string> = {
   jobsch: 'jobs.ch',
@@ -54,3 +69,11 @@ export const SOURCE_COLORS: Record<string, string> = {
   jobicy: '#059669',
   unknown: '#888',
 }
+
+export const LOCATION_OPTIONS: { value: LocationFilter; label: string; flag: string }[] = [
+  { value: 'all',    label: 'Alle Regionen', flag: '🌍' },
+  { value: 'ch',     label: 'Schweiz',       flag: '🇨🇭' },
+  { value: 'de',     label: 'Deutschland',   flag: '🇩🇪' },
+  { value: 'at',     label: 'Österreich',    flag: '🇦🇹' },
+  { value: 'remote', label: 'Remote',        flag: '💻' },
+]

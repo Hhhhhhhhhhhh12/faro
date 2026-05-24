@@ -16,6 +16,7 @@ const DEFAULT: AppStorage = {
   profile: null,
   jobs: [],
   jobsFetchedAt: null,
+  searchParams: null,
 }
 
 export function loadStorage(): AppStorage {

@@ -36,10 +36,18 @@ export interface SkillGapItem {
   training: TrainingResource
 }
 
+export type LocationFilter = 'all' | 'de' | 'remote'
+
+export interface SearchParams {
+  query: string
+  location: LocationFilter
+}
+
 export interface AppStorage {
   profile: UserProfile | null
   jobs: Job[]
   jobsFetchedAt: number | null
+  searchParams: SearchParams | null
 }
 
 export interface SkillEntry {

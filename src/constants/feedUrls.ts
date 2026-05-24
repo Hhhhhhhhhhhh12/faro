@@ -1,4 +1,4 @@
-import type { FeedConfig } from '../types'
+import type { FeedConfig, LocationFilter, SearchParams } from '../types'
 
 export const FEEDS: FeedConfig[] = [
   // Arbeitnow — free JSON API, CORS-friendly, Germany/remote
@@ -33,6 +33,17 @@ export const FEEDS: FeedConfig[] = [
     url: 'https://jobicy.com/api/v2/remote-jobs?industry=engineering&count=20',
     type: 'json-jobicy',
   },
+]
+
+export const DEFAULT_SEARCH: SearchParams = {
+  query: 'data scientist',
+  location: 'all',
+}
+
+export const LOCATION_OPTIONS: { value: LocationFilter; flag: string; label: string }[] = [
+  { value: 'all', flag: '🌍', label: 'Alle Regionen' },
+  { value: 'de', flag: '🇩🇪', label: 'Deutschland' },
+  { value: 'remote', flag: '🏠', label: 'Remote' },
 ]
 
 export const SOURCE_LABELS: Record<string, string> = {
